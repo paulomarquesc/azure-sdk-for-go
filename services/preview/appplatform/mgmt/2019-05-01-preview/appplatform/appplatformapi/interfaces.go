@@ -23,6 +23,13 @@ import (
 	"github.com/Azure/go-autorest/autorest"
 )
 
+// ServicesTestClientAPI contains the set of methods on the ServicesTestClient type.
+type ServicesTestClientAPI interface {
+	Get(ctx context.Context, resourceGroupName string, serviceName string) (result appplatform.ServiceResource, err error)
+}
+
+var _ ServicesTestClientAPI = (*appplatform.ServicesTestClient)(nil)
+
 // ServicesClientAPI contains the set of methods on the ServicesClient type.
 type ServicesClientAPI interface {
 	CheckNameAvailability(ctx context.Context, location string, availabilityParameters appplatform.NameAvailabilityParameters) (result appplatform.NameAvailability, err error)
@@ -30,7 +37,6 @@ type ServicesClientAPI interface {
 	Delete(ctx context.Context, resourceGroupName string, serviceName string) (result appplatform.ServicesDeleteFuture, err error)
 	DisableTestEndpoint(ctx context.Context, resourceGroupName string, serviceName string) (result autorest.Response, err error)
 	EnableTestEndpoint(ctx context.Context, resourceGroupName string, serviceName string) (result appplatform.TestKeys, err error)
-	Get(ctx context.Context, resourceGroupName string, serviceName string) (result appplatform.ServiceResource, err error)
 	List(ctx context.Context, resourceGroupName string) (result appplatform.ServiceResourceListPage, err error)
 	ListBySubscription(ctx context.Context) (result appplatform.ServiceResourceListPage, err error)
 	ListTestKeys(ctx context.Context, resourceGroupName string, serviceName string) (result appplatform.TestKeys, err error)

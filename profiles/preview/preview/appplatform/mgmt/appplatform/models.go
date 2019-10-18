@@ -172,6 +172,7 @@ type ServiceSpecification = original.ServiceSpecification
 type ServicesClient = original.ServicesClient
 type ServicesCreateOrUpdateFuture = original.ServicesCreateOrUpdateFuture
 type ServicesDeleteFuture = original.ServicesDeleteFuture
+type ServicesTestClient = original.ServicesTestClient
 type ServicesUpdateFuture = original.ServicesUpdateFuture
 type TemporaryDisk = original.TemporaryDisk
 type TestKeys = original.TestKeys
@@ -241,6 +242,12 @@ func NewServicesClient(subscriptionID string) ServicesClient {
 }
 func NewServicesClientWithBaseURI(baseURI string, subscriptionID string) ServicesClient {
 	return original.NewServicesClientWithBaseURI(baseURI, subscriptionID)
+}
+func NewServicesTestClient(subscriptionID string) ServicesTestClient {
+	return original.NewServicesTestClient(subscriptionID)
+}
+func NewServicesTestClientWithBaseURI(baseURI string, subscriptionID string) ServicesTestClient {
+	return original.NewServicesTestClientWithBaseURI(baseURI, subscriptionID)
 }
 func NewWithBaseURI(baseURI string, subscriptionID string) BaseClient {
 	return original.NewWithBaseURI(baseURI, subscriptionID)

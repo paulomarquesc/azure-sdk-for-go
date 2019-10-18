@@ -26,3 +26,4 @@ type BindingsClientAPI = original.BindingsClientAPI
 type DeploymentsClientAPI = original.DeploymentsClientAPI
 type OperationsClientAPI = original.OperationsClientAPI
 type ServicesClientAPI = original.ServicesClientAPI
+type ServicesTestClientAPI = original.ServicesTestClientAPI
