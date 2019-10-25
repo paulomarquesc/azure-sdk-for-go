@@ -920,7 +920,7 @@ type ComponentPurgeBodyFilters struct {
 	// Operator - A query operator to evaluate over the provided column and value(s). Supported operators are ==, =~, in, in~, >, >=, <, <=, between, and have the same behavior as they would in a KQL query.
 	Operator *string `json:"operator,omitempty"`
 	// Value - the value for the operator to function over. This can be a number (e.g., > 100), a string (timestamp >= '2017-09-01') or array of values.
-	Value interface{} `json:"value,omitempty"`
+	Value *string `json:"value,omitempty"`
 	// Key - When filtering over custom dimensions, this key will be used as the name of the custom dimension.
 	Key *string `json:"key,omitempty"`
 }
