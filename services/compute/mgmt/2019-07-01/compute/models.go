@@ -4128,6 +4128,8 @@ type DiskUpdateProperties struct {
 	DiskIOPSReadWrite *int64 `json:"diskIOPSReadWrite,omitempty"`
 	// DiskMBpsReadWrite - The bandwidth allowed for this disk; only settable for UltraSSD disks. MBps means millions of bytes per second - MB here uses the ISO notation, of powers of 10.
 	DiskMBpsReadWrite *int32 `json:"diskMBpsReadWrite,omitempty"`
+	// Encryption - Encryption property can be used to encrypt data at rest with customer managed keys or platform managed keys.
+	Encryption *Encryption `json:"encryption,omitempty"`
 }
 
 // Encryption encryption at rest settings for disk or snapshot
@@ -9067,6 +9069,8 @@ type SnapshotUpdateProperties struct {
 	DiskSizeGB *int32 `json:"diskSizeGB,omitempty"`
 	// EncryptionSettingsCollection - Encryption settings collection used be Azure Disk Encryption, can contain multiple encryption settings per disk or snapshot.
 	EncryptionSettingsCollection *EncryptionSettingsCollection `json:"encryptionSettingsCollection,omitempty"`
+	// Encryption - Encryption property can be used to encrypt data at rest with customer managed keys or platform managed keys.
+	Encryption *Encryption `json:"encryption,omitempty"`
 }
 
 // SourceVault the vault id is an Azure Resource Manager Resource id in the form
