@@ -153,7 +153,8 @@ func (client EventHubsClient) CreateOrUpdateResponder(resp *http.Response) (resu
 	return
 }
 
-// CreateOrUpdateAuthorizationRule creates or updates an AuthorizationRule for the specified Event Hub.
+// CreateOrUpdateAuthorizationRule creates or updates an AuthorizationRule for the specified Event Hub. Creation/update
+// of the AuthorizationRule will take a few seconds to take effect.
 // Parameters:
 // resourceGroupName - name of the resource group within the azure subscription.
 // namespaceName - the Namespace name
