@@ -1080,8 +1080,147 @@ type PolicyStatesQueryResults struct {
 	OdataContext *string `json:"@odata.context,omitempty"`
 	// OdataCount - OData entity count; represents the number of policy state records returned.
 	OdataCount *int32 `json:"@odata.count,omitempty"`
+	// OdataNextLink - Odata next link; URL to get the next set of results.
+	OdataNextLink *string `json:"@odata.nextLink,omitempty"`
 	// Value - Query results.
 	Value *[]PolicyState `json:"value,omitempty"`
+}
+
+// PolicyStatesQueryResultsIterator provides access to a complete listing of PolicyState values.
+type PolicyStatesQueryResultsIterator struct {
+	i    int
+	page PolicyStatesQueryResultsPage
+}
+
+// NextWithContext advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+func (iter *PolicyStatesQueryResultsIterator) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesQueryResultsIterator.NextWithContext")
+		defer func() {
+			sc := -1
+			if iter.Response().Response.Response != nil {
+				sc = iter.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	iter.i++
+	if iter.i < len(iter.page.Values()) {
+		return nil
+	}
+	err = iter.page.NextWithContext(ctx)
+	if err != nil {
+		iter.i--
+		return err
+	}
+	iter.i = 0
+	return nil
+}
+
+// Next advances to the next value.  If there was an error making
+// the request the iterator does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (iter *PolicyStatesQueryResultsIterator) Next() error {
+	return iter.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the enumeration should be started or is not yet complete.
+func (iter PolicyStatesQueryResultsIterator) NotDone() bool {
+	return iter.page.NotDone() && iter.i < len(iter.page.Values())
+}
+
+// Response returns the raw server response from the last page request.
+func (iter PolicyStatesQueryResultsIterator) Response() PolicyStatesQueryResults {
+	return iter.page.Response()
+}
+
+// Value returns the current value or a zero-initialized value if the
+// iterator has advanced beyond the end of the collection.
+func (iter PolicyStatesQueryResultsIterator) Value() PolicyState {
+	if !iter.page.NotDone() {
+		return PolicyState{}
+	}
+	return iter.page.Values()[iter.i]
+}
+
+// Creates a new instance of the PolicyStatesQueryResultsIterator type.
+func NewPolicyStatesQueryResultsIterator(page PolicyStatesQueryResultsPage) PolicyStatesQueryResultsIterator {
+	return PolicyStatesQueryResultsIterator{page: page}
+}
+
+// IsEmpty returns true if the ListResult contains no values.
+func (psqr PolicyStatesQueryResults) IsEmpty() bool {
+	return psqr.Value == nil || len(*psqr.Value) == 0
+}
+
+// policyStatesQueryResultsPreparer prepares a request to retrieve the next set of results.
+// It returns nil if no more results exist.
+func (psqr PolicyStatesQueryResults) policyStatesQueryResultsPreparer(ctx context.Context) (*http.Request, error) {
+	if psqr.OdataNextLink == nil || len(to.String(psqr.OdataNextLink)) < 1 {
+		return nil, nil
+	}
+	return autorest.Prepare((&http.Request{}).WithContext(ctx),
+		autorest.AsJSON(),
+		autorest.AsGet(),
+		autorest.WithBaseURL(to.String(psqr.OdataNextLink)))
+}
+
+// PolicyStatesQueryResultsPage contains a page of PolicyState values.
+type PolicyStatesQueryResultsPage struct {
+	fn   func(context.Context, PolicyStatesQueryResults) (PolicyStatesQueryResults, error)
+	psqr PolicyStatesQueryResults
+}
+
+// NextWithContext advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+func (page *PolicyStatesQueryResultsPage) NextWithContext(ctx context.Context) (err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesQueryResultsPage.NextWithContext")
+		defer func() {
+			sc := -1
+			if page.Response().Response.Response != nil {
+				sc = page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	next, err := page.fn(ctx, page.psqr)
+	if err != nil {
+		return err
+	}
+	page.psqr = next
+	return nil
+}
+
+// Next advances to the next page of values.  If there was an error making
+// the request the page does not advance and the error is returned.
+// Deprecated: Use NextWithContext() instead.
+func (page *PolicyStatesQueryResultsPage) Next() error {
+	return page.NextWithContext(context.Background())
+}
+
+// NotDone returns true if the page enumeration should be started or is not yet complete.
+func (page PolicyStatesQueryResultsPage) NotDone() bool {
+	return !page.psqr.IsEmpty()
+}
+
+// Response returns the raw server response from the last page request.
+func (page PolicyStatesQueryResultsPage) Response() PolicyStatesQueryResults {
+	return page.psqr
+}
+
+// Values returns the slice of values for the current page or nil if there are no values.
+func (page PolicyStatesQueryResultsPage) Values() []PolicyState {
+	if page.psqr.IsEmpty() {
+		return nil
+	}
+	return *page.psqr.Value
+}
+
+// Creates a new instance of the PolicyStatesQueryResultsPage type.
+func NewPolicyStatesQueryResultsPage(getNextPage func(context.Context, PolicyStatesQueryResults) (PolicyStatesQueryResults, error)) PolicyStatesQueryResultsPage {
+	return PolicyStatesQueryResultsPage{fn: getNextPage}
 }
 
 // PolicyTrackedResource policy tracked resource record.

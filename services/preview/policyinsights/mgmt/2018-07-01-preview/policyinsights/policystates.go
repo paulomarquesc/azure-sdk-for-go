@@ -133,13 +133,13 @@ func (client PolicyStatesClient) GetMetadataResponder(resp *http.Response) (resu
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForManagementGroup(ctx context.Context, policyStatesResource PolicyStatesResource, managementGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForManagementGroup(ctx context.Context, policyStatesResource PolicyStatesResource, managementGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForManagementGroup")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -151,6 +151,7 @@ func (client PolicyStatesClient) ListQueryResultsForManagementGroup(ctx context.
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForManagementGroup", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForManagementGroupNextResults
 	req, err := client.ListQueryResultsForManagementGroupPreparer(ctx, policyStatesResource, managementGroupName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForManagementGroup", nil, "Failure preparing request")
@@ -159,12 +160,12 @@ func (client PolicyStatesClient) ListQueryResultsForManagementGroup(ctx context.
 
 	resp, err := client.ListQueryResultsForManagementGroupSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForManagementGroup", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForManagementGroupResponder(resp)
+	result.psqr, err = client.ListQueryResultsForManagementGroupResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForManagementGroup", resp, "Failure responding to request")
 	}
@@ -234,6 +235,43 @@ func (client PolicyStatesClient) ListQueryResultsForManagementGroupResponder(res
 	return
 }
 
+// listQueryResultsForManagementGroupNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForManagementGroupNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForManagementGroupNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForManagementGroupSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForManagementGroupNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForManagementGroupResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForManagementGroupNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForManagementGroupComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForManagementGroupComplete(ctx context.Context, policyStatesResource PolicyStatesResource, managementGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForManagementGroup")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForManagementGroup(ctx, policyStatesResource, managementGroupName, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForPolicyDefinition queries policy states for the subscription level policy definition.
 // Parameters:
 // policyStatesResource - the virtual resource under PolicyStates resource type. In a given time range,
@@ -251,13 +289,13 @@ func (client PolicyStatesClient) ListQueryResultsForManagementGroupResponder(res
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForPolicyDefinition(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForPolicyDefinition(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForPolicyDefinition")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -269,6 +307,7 @@ func (client PolicyStatesClient) ListQueryResultsForPolicyDefinition(ctx context
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForPolicyDefinition", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForPolicyDefinitionNextResults
 	req, err := client.ListQueryResultsForPolicyDefinitionPreparer(ctx, policyStatesResource, subscriptionID, policyDefinitionName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicyDefinition", nil, "Failure preparing request")
@@ -277,12 +316,12 @@ func (client PolicyStatesClient) ListQueryResultsForPolicyDefinition(ctx context
 
 	resp, err := client.ListQueryResultsForPolicyDefinitionSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicyDefinition", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForPolicyDefinitionResponder(resp)
+	result.psqr, err = client.ListQueryResultsForPolicyDefinitionResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicyDefinition", resp, "Failure responding to request")
 	}
@@ -353,6 +392,43 @@ func (client PolicyStatesClient) ListQueryResultsForPolicyDefinitionResponder(re
 	return
 }
 
+// listQueryResultsForPolicyDefinitionNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForPolicyDefinitionNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicyDefinitionNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForPolicyDefinitionSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicyDefinitionNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForPolicyDefinitionResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicyDefinitionNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForPolicyDefinitionComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForPolicyDefinitionComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForPolicyDefinition")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForPolicyDefinition(ctx, policyStatesResource, subscriptionID, policyDefinitionName, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForPolicySetDefinition queries policy states for the subscription level policy set definition.
 // Parameters:
 // policyStatesResource - the virtual resource under PolicyStates resource type. In a given time range,
@@ -370,13 +446,13 @@ func (client PolicyStatesClient) ListQueryResultsForPolicyDefinitionResponder(re
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinition(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policySetDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinition(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policySetDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForPolicySetDefinition")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -388,6 +464,7 @@ func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinition(ctx cont
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForPolicySetDefinition", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForPolicySetDefinitionNextResults
 	req, err := client.ListQueryResultsForPolicySetDefinitionPreparer(ctx, policyStatesResource, subscriptionID, policySetDefinitionName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicySetDefinition", nil, "Failure preparing request")
@@ -396,12 +473,12 @@ func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinition(ctx cont
 
 	resp, err := client.ListQueryResultsForPolicySetDefinitionSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicySetDefinition", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForPolicySetDefinitionResponder(resp)
+	result.psqr, err = client.ListQueryResultsForPolicySetDefinitionResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForPolicySetDefinition", resp, "Failure responding to request")
 	}
@@ -472,6 +549,43 @@ func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinitionResponder
 	return
 }
 
+// listQueryResultsForPolicySetDefinitionNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForPolicySetDefinitionNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicySetDefinitionNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForPolicySetDefinitionSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicySetDefinitionNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForPolicySetDefinitionResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForPolicySetDefinitionNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForPolicySetDefinitionComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinitionComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policySetDefinitionName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForPolicySetDefinition")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForPolicySetDefinition(ctx, policyStatesResource, subscriptionID, policySetDefinitionName, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForResource queries policy states for the resource.
 // Parameters:
 // policyStatesResource - the virtual resource under PolicyStates resource type. In a given time range,
@@ -490,13 +604,13 @@ func (client PolicyStatesClient) ListQueryResultsForPolicySetDefinitionResponder
 // apply - oData apply expression for aggregations.
 // expand - the $expand query parameter. For example, to expand policyEvaluationDetails, use
 // $expand=policyEvaluationDetails
-func (client PolicyStatesClient) ListQueryResultsForResource(ctx context.Context, policyStatesResource PolicyStatesResource, resourceID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string, expand string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForResource(ctx context.Context, policyStatesResource PolicyStatesResource, resourceID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string, expand string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResource")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -508,6 +622,7 @@ func (client PolicyStatesClient) ListQueryResultsForResource(ctx context.Context
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForResource", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForResourceNextResults
 	req, err := client.ListQueryResultsForResourcePreparer(ctx, policyStatesResource, resourceID, top, orderBy, selectParameter, from, toParameter, filter, apply, expand)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResource", nil, "Failure preparing request")
@@ -516,12 +631,12 @@ func (client PolicyStatesClient) ListQueryResultsForResource(ctx context.Context
 
 	resp, err := client.ListQueryResultsForResourceSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResource", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForResourceResponder(resp)
+	result.psqr, err = client.ListQueryResultsForResourceResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResource", resp, "Failure responding to request")
 	}
@@ -593,6 +708,43 @@ func (client PolicyStatesClient) ListQueryResultsForResourceResponder(resp *http
 	return
 }
 
+// listQueryResultsForResourceNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForResourceNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForResourceSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForResourceResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForResourceComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForResourceComplete(ctx context.Context, policyStatesResource PolicyStatesResource, resourceID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string, expand string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResource")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForResource(ctx, policyStatesResource, resourceID, top, orderBy, selectParameter, from, toParameter, filter, apply, expand)
+	return
+}
+
 // ListQueryResultsForResourceGroup queries policy states for the resources under the resource group.
 // Parameters:
 // policyStatesResource - the virtual resource under PolicyStates resource type. In a given time range,
@@ -610,13 +762,13 @@ func (client PolicyStatesClient) ListQueryResultsForResourceResponder(resp *http
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForResourceGroup(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForResourceGroup(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResourceGroup")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -628,6 +780,7 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroup(ctx context.Co
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroup", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForResourceGroupNextResults
 	req, err := client.ListQueryResultsForResourceGroupPreparer(ctx, policyStatesResource, subscriptionID, resourceGroupName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroup", nil, "Failure preparing request")
@@ -636,12 +789,12 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroup(ctx context.Co
 
 	resp, err := client.ListQueryResultsForResourceGroupSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroup", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForResourceGroupResponder(resp)
+	result.psqr, err = client.ListQueryResultsForResourceGroupResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroup", resp, "Failure responding to request")
 	}
@@ -711,6 +864,43 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupResponder(resp 
 	return
 }
 
+// listQueryResultsForResourceGroupNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForResourceGroupNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForResourceGroupSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForResourceGroupResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForResourceGroupComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForResourceGroupComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResourceGroup")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForResourceGroup(ctx, policyStatesResource, subscriptionID, resourceGroupName, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForResourceGroupLevelPolicyAssignment queries policy states for the resource group level policy
 // assignment.
 // Parameters:
@@ -730,13 +920,13 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupResponder(resp 
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssignment(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssignment(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResourceGroupLevelPolicyAssignment")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -748,6 +938,7 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssi
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroupLevelPolicyAssignment", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults
 	req, err := client.ListQueryResultsForResourceGroupLevelPolicyAssignmentPreparer(ctx, policyStatesResource, subscriptionID, resourceGroupName, policyAssignmentName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroupLevelPolicyAssignment", nil, "Failure preparing request")
@@ -756,12 +947,12 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssi
 
 	resp, err := client.ListQueryResultsForResourceGroupLevelPolicyAssignmentSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroupLevelPolicyAssignment", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForResourceGroupLevelPolicyAssignmentResponder(resp)
+	result.psqr, err = client.ListQueryResultsForResourceGroupLevelPolicyAssignmentResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForResourceGroupLevelPolicyAssignment", resp, "Failure responding to request")
 	}
@@ -833,6 +1024,43 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssi
 	return
 }
 
+// listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForResourceGroupLevelPolicyAssignmentSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForResourceGroupLevelPolicyAssignmentResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForResourceGroupLevelPolicyAssignmentNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForResourceGroupLevelPolicyAssignmentComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssignmentComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, resourceGroupName string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForResourceGroupLevelPolicyAssignment")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForResourceGroupLevelPolicyAssignment(ctx, policyStatesResource, subscriptionID, resourceGroupName, policyAssignmentName, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForSubscription queries policy states for the resources under the subscription.
 // Parameters:
 // policyStatesResource - the virtual resource under PolicyStates resource type. In a given time range,
@@ -849,13 +1077,13 @@ func (client PolicyStatesClient) ListQueryResultsForResourceGroupLevelPolicyAssi
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForSubscription(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForSubscription(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForSubscription")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -867,6 +1095,7 @@ func (client PolicyStatesClient) ListQueryResultsForSubscription(ctx context.Con
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForSubscription", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForSubscriptionNextResults
 	req, err := client.ListQueryResultsForSubscriptionPreparer(ctx, policyStatesResource, subscriptionID, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscription", nil, "Failure preparing request")
@@ -875,12 +1104,12 @@ func (client PolicyStatesClient) ListQueryResultsForSubscription(ctx context.Con
 
 	resp, err := client.ListQueryResultsForSubscriptionSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscription", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForSubscriptionResponder(resp)
+	result.psqr, err = client.ListQueryResultsForSubscriptionResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscription", resp, "Failure responding to request")
 	}
@@ -949,6 +1178,43 @@ func (client PolicyStatesClient) ListQueryResultsForSubscriptionResponder(resp *
 	return
 }
 
+// listQueryResultsForSubscriptionNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForSubscriptionNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForSubscriptionSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForSubscriptionResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForSubscriptionComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForSubscriptionComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForSubscription")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForSubscription(ctx, policyStatesResource, subscriptionID, top, orderBy, selectParameter, from, toParameter, filter, apply)
+	return
+}
+
 // ListQueryResultsForSubscriptionLevelPolicyAssignment queries policy states for the subscription level policy
 // assignment.
 // Parameters:
@@ -967,13 +1233,13 @@ func (client PolicyStatesClient) ListQueryResultsForSubscriptionResponder(resp *
 // specified, the service uses request time.
 // filter - oData filter expression.
 // apply - oData apply expression for aggregations.
-func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssignment(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResults, err error) {
+func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssignment(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsPage, err error) {
 	if tracing.IsEnabled() {
 		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForSubscriptionLevelPolicyAssignment")
 		defer func() {
 			sc := -1
-			if result.Response.Response != nil {
-				sc = result.Response.Response.StatusCode
+			if result.psqr.Response.Response != nil {
+				sc = result.psqr.Response.Response.StatusCode
 			}
 			tracing.EndSpan(ctx, sc, err)
 		}()
@@ -985,6 +1251,7 @@ func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssig
 		return result, validation.NewError("policyinsights.PolicyStatesClient", "ListQueryResultsForSubscriptionLevelPolicyAssignment", err.Error())
 	}
 
+	result.fn = client.listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults
 	req, err := client.ListQueryResultsForSubscriptionLevelPolicyAssignmentPreparer(ctx, policyStatesResource, subscriptionID, policyAssignmentName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscriptionLevelPolicyAssignment", nil, "Failure preparing request")
@@ -993,12 +1260,12 @@ func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssig
 
 	resp, err := client.ListQueryResultsForSubscriptionLevelPolicyAssignmentSender(req)
 	if err != nil {
-		result.Response = autorest.Response{Response: resp}
+		result.psqr.Response = autorest.Response{Response: resp}
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscriptionLevelPolicyAssignment", resp, "Failure sending request")
 		return
 	}
 
-	result, err = client.ListQueryResultsForSubscriptionLevelPolicyAssignmentResponder(resp)
+	result.psqr, err = client.ListQueryResultsForSubscriptionLevelPolicyAssignmentResponder(resp)
 	if err != nil {
 		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "ListQueryResultsForSubscriptionLevelPolicyAssignment", resp, "Failure responding to request")
 	}
@@ -1066,6 +1333,43 @@ func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssig
 		autorest.ByUnmarshallingJSON(&result),
 		autorest.ByClosing())
 	result.Response = autorest.Response{Response: resp}
+	return
+}
+
+// listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults retrieves the next set of results, if any.
+func (client PolicyStatesClient) listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults(ctx context.Context, lastResults PolicyStatesQueryResults) (result PolicyStatesQueryResults, err error) {
+	req, err := lastResults.policyStatesQueryResultsPreparer(ctx)
+	if err != nil {
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults", nil, "Failure preparing next results request")
+	}
+	if req == nil {
+		return
+	}
+	resp, err := client.ListQueryResultsForSubscriptionLevelPolicyAssignmentSender(req)
+	if err != nil {
+		result.Response = autorest.Response{Response: resp}
+		return result, autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults", resp, "Failure sending next results request")
+	}
+	result, err = client.ListQueryResultsForSubscriptionLevelPolicyAssignmentResponder(resp)
+	if err != nil {
+		err = autorest.NewErrorWithError(err, "policyinsights.PolicyStatesClient", "listQueryResultsForSubscriptionLevelPolicyAssignmentNextResults", resp, "Failure responding to next results request")
+	}
+	return
+}
+
+// ListQueryResultsForSubscriptionLevelPolicyAssignmentComplete enumerates all values, automatically crossing page boundaries as required.
+func (client PolicyStatesClient) ListQueryResultsForSubscriptionLevelPolicyAssignmentComplete(ctx context.Context, policyStatesResource PolicyStatesResource, subscriptionID string, policyAssignmentName string, top *int32, orderBy string, selectParameter string, from *date.Time, toParameter *date.Time, filter string, apply string) (result PolicyStatesQueryResultsIterator, err error) {
+	if tracing.IsEnabled() {
+		ctx = tracing.StartSpan(ctx, fqdn+"/PolicyStatesClient.ListQueryResultsForSubscriptionLevelPolicyAssignment")
+		defer func() {
+			sc := -1
+			if result.Response().Response.Response != nil {
+				sc = result.page.Response().Response.Response.StatusCode
+			}
+			tracing.EndSpan(ctx, sc, err)
+		}()
+	}
+	result.page, err = client.ListQueryResultsForSubscriptionLevelPolicyAssignment(ctx, policyStatesResource, subscriptionID, policyAssignmentName, top, orderBy, selectParameter, from, toParameter, filter, apply)
 	return
 }
 
